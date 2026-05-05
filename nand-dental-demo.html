@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nand Dental Care – Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0077B6; --sky: #00B4D8; --lite: #90E0EF;
+    --bg: #F8FBFF; --dark: #0D1B2A; --muted: #5A6A7A; --white: #fff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--dark); overflow-x: hidden; }
+  a { text-decoration: none; color: inherit; }
+
+  /* Progress */
+  #bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: linear-gradient(90deg,var(--blue),var(--sky)); z-index: 9999; }
+
+  /* Topbar */
+  #top { background: var(--blue); color: #fff; font-size: 12.5px; padding: 7px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; font-family: 'DM Sans', sans-serif; }
+  #top a { color: #fff; }
+
+  /* Nav */
+  nav { position: sticky; top: 0; z-index: 100; background: transparent; transition: background .3s, box-shadow .3s; font-family: 'Poppins', sans-serif; }
+  nav.on { background: #fff; box-shadow: 0 2px 20px rgba(0,119,182,.12); }
+  .nav-w { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 1.15rem; color: var(--blue); }
+  .logo svg { width: 32px; height: 32px; }
+  .nav-links a { margin-left: 4px; padding: 7px 14px; border-radius: 8px; font-size: .9rem; font-weight: 500; color: var(--dark); transition: background .2s, color .2s; }
+  .nav-links a:hover, .nav-links a.act { color: var(--blue); background: rgba(0,119,182,.07); }
+  .ham { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 5px; }
+  .ham span { display: block; width: 24px; height: 2px; background: var(--blue); border-radius: 2px; }
+  .mob { display: none; background: #fff; padding: 12px 24px 18px; flex-direction: column; gap: 4px; box-shadow: 0 8px 20px rgba(0,119,182,.1); }
+  .mob.open { display: flex; }
+  .mob a { padding: 9px 12px; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: .92rem; font-weight: 500; }
+  .mob a:hover { background: rgba(0,119,182,.06); color: var(--blue); }
+
+  /* Hero */
+  #hero { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg,#003f6e,#0077B6 45%,#00B4D8 80%,#90E0EF); background-size: 300% 300%; animation: gpulse 8s ease infinite; position: relative; overflow: hidden; }
+  @keyframes gpulse { 0%,100%{background-position:0 50%} 50%{background-position:100% 50%} }
+  #hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 75% 50%,rgba(144,224,239,.18),transparent 65%); }
+  .hero-w { max-width: 1100px; margin: 0 auto; padding: 100px 24px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; position: relative; z-index: 1; }
+  .hero-l { color: #fff; }
+  .htitle { font-family: 'Poppins', sans-serif; font-size: clamp(2rem,4.5vw,3.4rem); font-weight: 900; line-height: 1.1; margin-bottom: 16px; display: flex; flex-wrap: wrap; }
+  .hw { display: inline-flex; margin-right: .25em; }
+  .lt { display: inline-block; opacity: 0; animation: ldrop .5s cubic-bezier(.3,1.4,.5,1) forwards; }
+  @keyframes ldrop { from{opacity:0;transform:translateY(-55px)} to{opacity:1;transform:translateY(0)} }
+  .hsub { font-family:'Poppins',sans-serif; font-size:1.05rem; font-weight:600; color:var(--lite); margin-bottom:14px; opacity:0; animation:fup .7s 1.5s ease forwards; }
+  .hdesc { font-size:.97rem; line-height:1.75; color:rgba(255,255,255,.88); margin-bottom:32px; max-width:460px; opacity:0; animation:fup .7s 1.7s ease forwards; }
+  .hbtns { display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:fup .7s 1.9s ease forwards; }
+  @keyframes fup { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  .btn-p { background:#fff; color:var(--blue); font-family:'Poppins',sans-serif; font-weight:700; font-size:.92rem; padding:13px 28px; border-radius:50px; border:none; cursor:pointer; display:inline-block; transition:transform .3s,box-shadow .3s; }
+  .btn-p:hover { transform:translateY(-3px); box-shadow:0 10px 26px rgba(0,0,0,.18); }
+  .btn-o { background:transparent; color:#fff; border:2.5px solid rgba(255,255,255,.65); font-family:'Poppins',sans-serif; font-weight:600; font-size:.92rem; padding:11px 26px; border-radius:50px; cursor:pointer; display:inline-block; transition:transform .3s,background .3s,box-shadow .3s; }
+  .btn-o:hover { transform:translateY(-3px); background:rgba(255,255,255,.12); box-shadow:0 8px 22px rgba(0,0,0,.15); }
+  .hero-r { display:flex; justify-content:center; opacity:0; animation:fup .9s 1.2s ease forwards; }
+  .hero-box { width:300px; height:300px; border-radius:28px; background:rgba(144,224,239,.22); backdrop-filter:blur(10px); border:2px solid rgba(255,255,255,.22); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 20px 56px rgba(0,0,0,.18); }
+  .hero-box p { color:rgba(255,255,255,.9); font-family:'Poppins',sans-serif; font-weight:600; font-size:.9rem; margin-top:14px; }
+
+  /* Stats */
+  #stats { background:var(--blue); padding:50px 0; }
+  .sg { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+  .sc { text-align:center; padding:28px 16px; border-right:1px solid rgba(255,255,255,.2); opacity:0; transform:translateY(28px); transition:opacity .6s,transform .6s; }
+  .sc:last-child { border-right:none; }
+  .sc.vis { opacity:1; transform:translateY(0); }
+  .sn { font-family:'Poppins',sans-serif; font-size:2.6rem; font-weight:900; color:#fff; line-height:1; }
+  .sn span { color:var(--lite); }
+  .sl { color:rgba(255,255,255,.78); font-size:.88rem; margin-top:4px; }
+
+  /* About */
+  #about { background:#fff; padding:80px 0; }
+  .about-g { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .aimg { border-radius:18px; overflow:hidden; box-shadow:0 16px 50px rgba(0,119,182,.14); }
+  .aimg img { width:100%; height:380px; object-fit:cover; background:#90E0EF; }
+  .lbl { font-size:.75rem; font-weight:700; color:var(--sky); text-transform:uppercase; letter-spacing:3px; margin-bottom:8px; font-family:'Poppins',sans-serif; }
+  .sh { font-family:'Poppins',sans-serif; font-size:clamp(1.6rem,3vw,2.2rem); font-weight:800; line-height:1.2; margin-bottom:14px; opacity:0; transform:translateX(-70px); transition:opacity .7s,transform .7s; }
+  .sh.vis { opacity:1; transform:translateX(0); }
+  .sp { color:var(--muted); font-size:.95rem; line-height:1.7; margin-bottom:20px; }
+  .bulls { display:flex; flex-direction:column; gap:10px; margin-bottom:26px; }
+  .bull { display:flex; align-items:center; gap:10px; font-size:.93rem; font-weight:500; }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--sky); flex-shrink:0; }
+  .btn-b { background:var(--blue); color:#fff; font-family:'Poppins',sans-serif; font-weight:700; font-size:.9rem; padding:13px 30px; border-radius:50px; border:none; cursor:pointer; display:inline-block; transition:transform .3s,box-shadow .3s; }
+  .btn-b:hover { transform:translateY(-3px); box-shadow:0 10px 26px rgba(0,119,182,.35); }
+
+  /* Services */
+  #services { background:var(--bg); padding:80px 0; }
+  .sec-hd { text-align:center; max-width:1100px; margin:0 auto; padding:0 24px 44px; }
+  .srv-g { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .scard { background:#fff; border-radius:18px; padding:30px 24px; box-shadow:0 6px 28px rgba(0,119,182,.09); border:1.5px solid rgba(0,180,216,.09); opacity:0; transform:translateY(36px); transition:opacity .6s,transform .6s,box-shadow .3s; cursor:default; }
+  .scard.vis { opacity:1; transform:translateY(0); }
+  .scard:hover { box-shadow:0 14px 42px rgba(0,119,182,.17); transform:translateY(-4px); }
+  .sico { width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,rgba(0,180,216,.12),rgba(144,224,239,.2)); display:flex; align-items:center; justify-content:center; font-size:1.7rem; margin-bottom:16px; }
+  .scard h3 { font-family:'Poppins',sans-serif; font-weight:700; font-size:1rem; margin-bottom:7px; }
+  .scard p { color:var(--muted); font-size:.87rem; line-height:1.6; }
+
+  /* Gallery */
+  #gallery { background:#fff; padding:80px 0; }
+  .gal-g { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:44px; }
+  .gi { position:relative; border-radius:14px; overflow:hidden; cursor:pointer; box-shadow:0 4px 18px rgba(0,119,182,.09); }
+  .gi img { width:100%; height:240px; object-fit:cover; background:#90E0EF; transition:transform .4s; }
+  .gi:hover img { transform:scale(1.05); }
+  .gov { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,119,182,.82),transparent 55%); opacity:0; transition:opacity .4s; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:18px; }
+  .gi:hover .gov { opacity:1; }
+  .gcap { color:#fff; font-family:'Poppins',sans-serif; font-weight:600; font-size:.85rem; text-align:center; }
+
+  /* Lightbox */
+  #lb { display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,.92); align-items:center; justify-content:center; }
+  #lb.open { display:flex; }
+  .lb-in { position:relative; max-width:90vw; }
+  #lb-img { max-width:90vw; max-height:80vh; border-radius:10px; object-fit:contain; }
+  #lb-close { position:absolute; top:-42px; right:0; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; line-height:1; }
+  #lb-prev, #lb-next { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.15); border:none; color:#fff; font-size:1.6rem; width:44px; height:44px; border-radius:50%; cursor:pointer; backdrop-filter:blur(4px); }
+  #lb-prev { left:-60px; } #lb-next { right:-60px; }
+  #lb-cap { color:rgba(255,255,255,.8); text-align:center; margin-top:12px; font-family:'Poppins',sans-serif; font-size:.88rem; }
+
+  /* CTA */
+  #cta { background:linear-gradient(135deg,var(--blue),#005a9e); padding:70px 0; text-align:center; }
+  #cta h2 { font-family:'Poppins',sans-serif; font-size:clamp(1.6rem,3vw,2.3rem); font-weight:800; color:#fff; margin-bottom:12px; }
+  #cta p { color:rgba(255,255,255,.82); font-size:.97rem; margin-bottom:30px; }
+  .btn-wo { border:2.5px solid #fff; color:#fff; background:transparent; font-family:'Poppins',sans-serif; font-weight:700; font-size:.95rem; padding:13px 34px; border-radius:50px; cursor:pointer; display:inline-block; transition:transform .3s,background .3s,box-shadow .3s; }
+  .btn-wo:hover { transform:translateY(-3px); background:rgba(255,255,255,.12); box-shadow:0 10px 28px rgba(0,0,0,.2); }
+
+  /* Contact */
+  #contact { background:var(--bg); padding:80px 0; }
+  .con-g { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1.2fr; gap:50px; margin-top:44px; }
+  .cinfo { display:flex; flex-direction:column; gap:14px; }
+  .ccard { background:#fff; border-radius:14px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; box-shadow:0 4px 18px rgba(0,119,182,.09); border-left:4px solid var(--sky); }
+  .cico { width:40px; height:40px; border-radius:9px; background:linear-gradient(135deg,var(--sky),var(--lite)); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ccard strong { font-family:'Poppins',sans-serif; font-weight:600; font-size:.82rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:3px; }
+  .ccard p { color:var(--dark); font-size:.91rem; line-height:1.5; }
+  .cform { background:#fff; border-radius:18px; padding:36px; box-shadow:0 6px 28px rgba(0,119,182,.09); }
+  .cform h3 { font-family:'Poppins',sans-serif; font-weight:700; font-size:1.2rem; margin-bottom:22px; }
+  .fr { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .fg { margin-bottom:16px; }
+  .fg label { display:block; font-size:.82rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+  .fg input, .fg select, .fg textarea { width:100%; padding:11px 14px; border:1.5px solid #d0dce8; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:.92rem; color:var(--dark); background:var(--bg); outline:none; transition:border-color .2s,box-shadow .2s; }
+  .fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--sky); box-shadow:0 0 0 3px rgba(0,180,216,.1); }
+  .fg textarea { min-height:95px; resize:vertical; }
+  #ok { display:none; background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:9px; padding:12px 16px; margin-top:12px; font-weight:600; font-size:.91rem; }
+
+  /* Map */
+  #map { padding:0; }
+  #map iframe { width:100%; height:340px; border:none; display:block; }
+
+  /* Footer */
+  footer { background:var(--dark); color:#fff; padding:56px 0 0; }
+  .fg2 { max-width:1100px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; gap:44px; }
+  .fb p { color:rgba(255,255,255,.6); font-size:.88rem; line-height:1.7; margin-top:10px; }
+  .fsoc { display:flex; gap:10px; margin-top:16px; }
+  .fsoc a { width:38px; height:38px; border-radius:9px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; transition:background .2s,transform .2s; }
+  .fsoc a:hover { background:var(--sky); transform:translateY(-3px); }
+  .fc h4 { font-family:'Poppins',sans-serif; font-weight:700; font-size:.92rem; color:#fff; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,.1); }
+  .fc ul { display:flex; flex-direction:column; gap:8px; }
+  .fc ul a { color:rgba(255,255,255,.6); font-size:.87rem; transition:color .2s,padding-left .2s; display:block; }
+  .fc ul a:hover { color:var(--lite); padding-left:5px; }
+  .fci { display:flex; gap:9px; align-items:flex-start; color:rgba(255,255,255,.6); font-size:.85rem; margin-bottom:10px; }
+  .fci svg { flex-shrink:0; margin-top:2px; }
+  .fbot { margin-top:44px; border-top:1px solid rgba(255,255,255,.1); padding:18px 24px; text-align:center; color:rgba(255,255,255,.45); font-size:.82rem; }
+
+  /* Responsive */
+  @media(max-width:900px) {
+    .hero-w { grid-template-columns:1fr; text-align:center; }
+    .hero-r { justify-content:center; }
+    .hbtns { justify-content:center; }
+    .hdesc { margin:0 auto 32px; }
+    .about-g { grid-template-columns:1fr; }
+    .fg2 { grid-template-columns:1fr 1fr; gap:32px; }
+    .sg { grid-template-columns:1fr 1fr; }
+    .sc { border-right:none; border-bottom:1px solid rgba(255,255,255,.15); }
+  }
+  @media(max-width:640px) {
+    .nav-links { display:none; }
+    .ham { display:flex; }
+    .srv-g { grid-template-columns:1fr; }
+    .gal-g { grid-template-columns:1fr 1fr; }
+    .con-g { grid-template-columns:1fr; }
+    .fg2 { grid-template-columns:1fr; }
+    .fr { grid-template-columns:1fr; }
+    .sg { grid-template-columns:1fr 1fr; }
+    #lb-prev { left:-38px; } #lb-next { right:-38px; }
+  }
+  @media(max-width:440px) {
+    .gal-g { grid-template-columns:1fr; }
+    .hero-box { width:250px; height:250px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+
+<!-- TOPBAR -->
+<div id="top">
+  <span>📍 Near Govt. Hospital, Hanumangarh – 335513</span>
+  <a href="tel:+91XXXXXXXXXX">📞 Call: +91-XXXXXXXXXX</a>
+</div>
+
+<!-- NAVBAR -->
+<nav id="nav">
+  <div class="nav-w">
+    <a href="#hero" class="logo">
+      <svg viewBox="0 0 64 64" fill="none"><path d="M32 4C24 4 16 10 14 18C12 26 14 32 16 38C18 44 18 58 22 58C26 58 26 46 32 46C38 46 38 58 42 58C46 58 46 44 48 38C50 32 52 26 50 18C48 10 40 4 32 4Z" fill="url(#tg)" stroke="#0077B6" stroke-width="2"/><defs><linearGradient id="tg" x1="14" y1="4" x2="50" y2="58"><stop stop-color="#90E0EF"/><stop offset="1" stop-color="#0077B6"/></linearGradient></defs></svg>
+      Nand Dental Care
+    </a>
+    <div class="nav-links">
+      <a href="#hero" class="act">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="ham" id="ham"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mob" id="mob">
+    <a href="#hero">Home</a><a href="#about">About</a>
+    <a href="#services">Services</a><a href="#gallery">Gallery</a><a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-w">
+    <div class="hero-l">
+      <h1 class="htitle" id="ht"></h1>
+      <p class="hsub">Advanced Dental Care in Hanumangarh</p>
+      <p class="hdesc">Comprehensive dental treatments with modern technology and a gentle touch. Located near Govt. Hospital, Hanumangarh.</p>
+      <div class="hbtns">
+        <a href="#contact" class="btn-p">Book Appointment</a>
+        <a href="#services" class="btn-o">Our Services</a>
+      </div>
+    </div>
+    <div class="hero-r">
+      <div class="hero-box">
+        <svg width="120" height="130" viewBox="0 0 200 220" fill="none"><path d="M100 12C72 12 48 30 42 56C36 82 40 100 44 120C50 148 48 200 62 200C76 200 76 168 100 168C124 168 124 200 138 200C152 200 150 148 156 120C160 100 164 82 158 56C152 30 128 12 100 12Z" fill="rgba(255,255,255,0.9)" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><circle cx="130" cy="48" r="7" fill="rgba(0,180,216,0.35)"/></svg>
+        <p>✨ Your Smile, Our Priority</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="sg">
+    <div class="sc" data-t="1500" data-s="+"><div class="sn"><span class="ct">0</span><span>+</span></div><div class="sl">Patients Treated</div></div>
+    <div class="sc" data-t="10" data-s="+"><div class="sn"><span class="ct">0</span><span>+</span></div><div class="sl">Years Experience</div></div>
+    <div class="sc" data-t="20" data-s="+"><div class="sn"><span class="ct">0</span><span>+</span></div><div class="sl">Services Offered</div></div>
+    <div class="sc" data-t="100" data-s="%"><div class="sn"><span class="ct">0</span><span>%</span></div><div class="sl">Satisfaction Rate</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-g">
+    <div class="aimg">
+      <!-- ABOUT_IMAGE -->
+      <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600" alt="Nand Dental Care Clinic">
+    </div>
+    <div>
+      <p class="lbl">Who We Are</p>
+      <h2 class="sh">About Nand Dental Care</h2>
+      <p class="sp">Trusted dental clinic near Govt. Hospital, Hanumangarh — delivering advanced dental care with compassion and modern technology for every patient.</p>
+      <div class="bulls">
+        <div class="bull"><div class="dot"></div>Advanced Equipment & Technology</div>
+        <div class="bull"><div class="dot"></div>Gentle & Caring Staff</div>
+        <div class="bull"><div class="dot"></div>Affordable Prices for All</div>
+        <div class="bull"><div class="dot"></div>Convenient Location</div>
+      </div>
+      <a href="#contact" class="btn-b">Book Appointment</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="sec-hd">
+    <p class="lbl">What We Offer</p>
+    <h2 class="sh" style="transform:none;">Our Dental Services</h2>
+    <p style="color:var(--muted);font-size:.95rem;">Comprehensive care for the whole family.</p>
+  </div>
+  <div class="srv-g">
+    <div class="scard"><div class="sico">🦷</div><h3>General Dentistry</h3><p>Routine check-ups, cleanings and preventive care.</p></div>
+    <div class="scard"><div class="sico">✨</div><h3>Teeth Whitening</h3><p>Professional whitening to brighten your smile.</p></div>
+    <div class="scard"><div class="sico">😁</div><h3>Orthodontics</h3><p>Braces and aligners for all ages.</p></div>
+    <div class="scard"><div class="sico">💉</div><h3>Root Canal</h3><p>Gentle therapy to save infected teeth.</p></div>
+    <div class="scard"><div class="sico">🔩</div><h3>Dental Implants</h3><p>Permanent implants that look and feel natural.</p></div>
+    <div class="scard"><div class="sico">👶</div><h3>Pediatric Dentistry</h3><p>Child-friendly care for healthy young smiles.</p></div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;text-align:center;">
+    <p class="lbl">Inside Our Clinic</p>
+    <h2 class="sh" style="transform:none;display:inline-block;">Our Clinic Gallery</h2>
+  </div>
+  <div class="gal-g">
+    <!-- Gallery Image 1: dental clinic interior -->
+    <div class="gi" data-i="0" data-c="Modern Clinic Interior">
+      <img src="https://images.unsplash.com/photo-1588776814546-1ffbb172e8ab?w=600" alt="Gallery Image 1">
+      <div class="gov"><div class="gcap">Modern Clinic Interior</div></div>
+    </div>
+    <!-- Gallery Image 2: dentist at work -->
+    <div class="gi" data-i="1" data-c="Expert Dentist at Work">
+      <img src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=600" alt="Gallery Image 2">
+      <div class="gov"><div class="gcap">Expert Dentist at Work</div></div>
+    </div>
+    <!-- Gallery Image 3: dental equipment -->
+    <div class="gi" data-i="2" data-c="Advanced Equipment">
+      <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600" alt="Gallery Image 3">
+      <div class="gov"><div class="gcap">Advanced Equipment</div></div>
+    </div>
+    <!-- Gallery Image 4: smile treatment -->
+    <div class="gi" data-i="3" data-c="Smile Transformation">
+      <img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?w=600" alt="Gallery Image 4">
+      <div class="gov"><div class="gcap">Smile Transformation</div></div>
+    </div>
+    <!-- Gallery Image 5: dental chair -->
+    <div class="gi" data-i="4" data-c="Treatment Chair">
+      <img src="https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=600" alt="Gallery Image 5">
+      <div class="gov"><div class="gcap">Treatment Chair</div></div>
+    </div>
+    <!-- Gallery Image 6: clinic staff -->
+    <div class="gi" data-i="5" data-c="Our Caring Team">
+      <img src="https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600" alt="Gallery Image 6">
+      <div class="gov"><div class="gcap">Our Caring Team</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lb">
+  <div class="lb-in">
+    <button id="lb-close">&times;</button>
+    <img id="lb-img" src="" alt="">
+    <button id="lb-prev">&#8249;</button>
+    <button id="lb-next">&#8250;</button>
+    <div id="lb-cap"></div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section id="cta">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;">
+    <h2>Book Your Appointment Today</h2>
+    <p>Visit us near Govt. Hospital, Hanumangarh or call to schedule.</p>
+    <a href="#contact" class="btn-wo">Contact Us</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;text-align:center;">
+    <p class="lbl">Get In Touch</p>
+    <h2 class="sh" style="transform:none;display:inline-block;">Contact Us</h2>
+  </div>
+  <div class="con-g">
+    <div class="cinfo">
+      <div class="ccard">
+        <div class="cico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><strong>Address</strong><p>Near Govt. Hospital, Hanumangarh – 335513, Rajasthan</p></div>
+      </div>
+      <div class="ccard">
+        <div class="cico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
+        <div><strong>Hours</strong><p>Mon – Sat: 10:00 AM onwards</p></div>
+      </div>
+      <div class="ccard">
+        <div class="cico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+        <div><strong>Phone</strong><p><a href="tel:+91XXXXXXXXXX" style="color:var(--blue);font-weight:600;">+91-XXXXXXXXXX</a></p></div>
+      </div>
+      <div class="ccard">
+        <div class="cico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div><strong>Email</strong><p><a href="mailto:nanddentalcare@email.com" style="color:var(--blue);">nanddentalcare@email.com</a></p></div>
+      </div>
+    </div>
+    <div class="cform">
+      <h3>Send Us a Message</h3>
+      <div class="fr">
+        <div class="fg"><label>Full Name</label><input type="text" id="fn" placeholder="Your name"></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="fp" placeholder="+91-XXXXXXXXXX"></div>
+      </div>
+      <div class="fg"><label>Email</label><input type="email" id="fe" placeholder="your@email.com"></div>
+      <div class="fg">
+        <label>Service</label>
+        <select id="fs">
+          <option value="">-- Select Service --</option>
+          <option>General Dentistry</option><option>Teeth Whitening</option>
+          <option>Orthodontics</option><option>Root Canal</option>
+          <option>Dental Implants</option><option>Pediatric Dentistry</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea id="fm" placeholder="Your message..."></textarea></div>
+      <button class="btn-b" onclick="send()" style="width:100%;padding:15px;font-size:.95rem;">Send Message</button>
+      <div id="ok">✅ Thank you! We'll contact you soon.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<div id="map">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56430!2d74.2825!3d29.5785!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3914a96d62e5ded9%3A0x6b3cfce23bc7b72a!2sHanumangarh%2C%20Rajasthan!5e0!3m2!1sen!2sin!4v1700000000000" allowfullscreen="" loading="lazy" title="Nand Dental Care Location"></iframe>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fg2">
+    <div class="fb">
+      <div class="logo" style="color:#fff;">
+        <svg viewBox="0 0 64 64" fill="none" style="width:28px;height:28px;"><path d="M32 4C24 4 16 10 14 18C12 26 14 32 16 38C18 44 18 58 22 58C26 58 26 46 32 46C38 46 38 58 42 58C46 58 46 44 48 38C50 32 52 26 50 18C48 10 40 4 32 4Z" fill="url(#tgf)"/><defs><linearGradient id="tgf" x1="14" y1="4" x2="50" y2="58"><stop stop-color="#90E0EF"/><stop offset="1" stop-color="#00B4D8"/></linearGradient></defs></svg>
+        Nand Dental Care
+      </div>
+      <p>Your Smile, Our Priority. Advanced dental care in Hanumangarh, Rajasthan.</p>
+      <div class="fsoc">
+        <a href="#" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a href="https://wa.me/91XXXXXXXXXX" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></a>
+      </div>
+    </div>
+    <div class="fc"><h4>Quick Links</h4><ul><li><a href="#hero">Home</a></li><li><a href="#about">About</a></li><li><a href="#services">Services</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#contact">Contact</a></li></ul></div>
+   
+      <h4>Contact</h4>
+      <div class="fci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Hanumangarh – 335513, Rajasthan</span></div>
+      <div class="fci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg><span>+91-XXXXXXXXXX</span></div>
+      <div class="fci"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg><span>Mon–Sat: 10:00 AM onwards</span></div>
+    </div>
+  </div>
+  <div class="fbot">© 2026 Nand Dental Care. All Rights Reserved. | Hanumangarh, Rajasthan</div>
+</footer>
+
+<script>
+// Progress bar
+const bar = document.getElementById('bar');
+window.addEventListener('scroll', () => {
+  bar.style.width = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100) + '%';
+});
+
+// Navbar
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('on', window.scrollY > 60));
+
+// Hamburger
+document.getElementById('ham').addEventListener('click', () => document.getElementById('mob').classList.toggle('open'));
+document.querySelectorAll('#mob a').forEach(a => a.addEventListener('click', () => document.getElementById('mob').classList.remove('open')));
+
+// Hero letter drop
+const ht = document.getElementById('ht');
+let li = 0;
+'Nand Dental Care'.split(' ').forEach(w => {
+  const ws = document.createElement('span'); ws.className = 'hw';
+  w.split('').forEach(c => {
+    const s = document.createElement('span'); s.className = 'lt'; s.textContent = c;
+    s.style.animationDelay = (li++ * 0.05) + 's'; ws.appendChild(s);
+  });
+  ht.appendChild(ws); li++;
+});
+
+// Intersection observer helper
+function obs(sel, cb, opt={threshold:0.18}) {
+  const io = new IntersectionObserver((es) => es.forEach(e => { if(e.isIntersecting){ cb(e.target); io.unobserve(e.target); }}), opt);
+  document.querySelectorAll(sel).forEach(el => io.observe(el));
+}
+
+// Section headings
+obs('.sh', el => el.classList.add('vis'));
+
+// Stats counters
+obs('.sc', el => {
+  el.classList.add('vis');
+  const t = parseInt(el.dataset.t), c = el.querySelector('.ct');
+  let n = 0; const s = Math.ceil(t/60);
+  const ti = setInterval(() => { n = Math.min(n + s, t); c.textContent = n; if(n >= t) clearInterval(ti); }, 25);
+}, {threshold:0.3});
+
+// Service cards stagger
+document.querySelectorAll('.scard').forEach((c, i) => {
+  const io = new IntersectionObserver(([e]) => { if(e.isIntersecting){ setTimeout(()=>c.classList.add('vis'), (i%3)*110); io.unobserve(c); }}, {threshold:0.15});
+  io.observe(c);
+});
+
+// Lightbox
+const gis = document.querySelectorAll('.gi');
+const gdata = Array.from(gis).map(g => ({src: g.querySelector('img').src, cap: g.dataset.c}));
+let ci = 0;
+const lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img'), lbCap = document.getElementById('lb-cap');
+function openLb(i) { ci=i; lbImg.src=gdata[i].src; lbCap.textContent=gdata[i].cap; lb.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeLb() { lb.classList.remove('open'); document.body.style.overflow=''; }
+function nav2(d) { ci=(ci+d+gdata.length)%gdata.length; lbImg.src=gdata[ci].src; lbCap.textContent=gdata[ci].cap; }
+gis.forEach((g,i) => g.addEventListener('click', () => openLb(i)));
+document.getElementById('lb-close').onclick = closeLb;
+document.getElementById('lb-prev').onclick = () => nav2(-1);
+document.getElementById('lb-next').onclick = () => nav2(1);
+lb.addEventListener('click', e => { if(e.target===lb) closeLb(); });
+document.addEventListener('keydown', e => { if(!lb.classList.contains('open')) return; if(e.key==='Escape') closeLb(); if(e.key==='ArrowLeft') nav2(-1); if(e.key==='ArrowRight') nav2(1); });
+
+// Form submit
+function send() {
+  if (!document.getElementById('fn').value.trim()) { alert('Please enter your name.'); return; }
+  ['fn','fp','fe','fs','fm'].forEach(id => document.getElementById(id).value = '');
+  const ok = document.getElementById('ok'); ok.style.display = 'block';
+  setTimeout(() => ok.style.display = 'none', 5000);
+}
+</script>
+</body>
+</html>
